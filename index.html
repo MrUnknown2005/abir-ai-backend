@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abir's Smart Routine v3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .section-title { @apply text-lg font-semibold text-slate-800 pb-2; }
+        /* Markdown Styles */
+        .prose h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1rem; color: #1e40af; }
+        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-top: 0.5rem; }
+        .prose li { margin-bottom: 0.25rem; }
+        .prose strong { color: #0f172a; font-weight: 600; }
+
+        .loading-dots:after {
+            content: ' .';
+            animation: dots 1s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: ' .'; }
+            40% { content: ' ..'; }
+            60% { content: ' ...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen p-4">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- HEADER -->
+        <div class="bg-white p-6 shadow-sm rounded-xl border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    Abir's Smart Routine <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">v3 AI</span>
+                </h1>
+                <p class="text-slate-500 mt-1">CSE Student • AI Builder • Discipline Journey</p>
+            </div>
+            <div class="flex gap-3 mt-4 md:mt-0">
+                <button onclick="downloadCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow-md transition-colors flex items-center gap-2 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="flex gap-4 border-b border-slate-300 overflow-x-auto">
+            <button id="tab-schedule" onclick="switchTab('schedule')" class="pb-2 border-b-2 border-blue-600 text-blue-600 font-medium px-2 whitespace-nowrap">Weekly Routine</button>
+            <button id="tab-habit" onclick="switchTab('habit')" class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-medium px-2 whitespace-nowrap">Habit & Prayer</button>
+            <button id="tab-ai" onclick="switchTab('ai')" class="pb-2 border-b-2 border-transparent text-indigo-600 hover:text-indigo-800 font-medium px-2 flex items-center gap-2 whitespace-nowrap">
+                <span>✨ AI Coach</span>
+            </button>
+        </div>
+
+        <!-- WEEKLY ROUTINE -->
+        <div id="view-schedule" class="block">
+            <div class="bg-white p-6 shadow-sm rounded-xl border border-slate-200 overflow-x-auto">
+
+                <!-- Sleep Block -->
+                <div class="hidden md:block mb-8">
+                    <h2 class="text-xl font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 22h20"/><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M17.66 12.34 19.07 10.93"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 19.07-1.41-1.41"/></svg>
+                        Sleep Schedule
+                    </h2>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200 text-center">
+                            <p class="font-semibold text-indigo-900 text-sm">Wind Down</p>
+                            <p class="text-xs text-indigo-700">10:30 PM</p>
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-center">
+                            <p class="font-semibold text-blue-900 text-sm">In Bed</p>
+                            <p class="text-xs text-blue-700">12:00 AM</p>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-lg border border-purple-200 text-center">
+                            <p class="font-semibold text-purple-900 text-sm">Sleep</p>
+                            <p class="text-xs text-purple-700">12:30 AM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRID -->
+                <table class="w-full text-sm border-separate border-spacing-y-2 min-w-[800px]">
+                    <thead>
+                        <tr class="text-xs uppercase text-slate-500">
+                            <th class="p-3 bg-slate-200 rounded-lg w-24">Time</th>
+                            <th class="p-3 bg-purple-200 rounded-lg w-1/7">Sat (Growth)</th>
+                            <th class="p-3 bg-purple-200 rounded-lg w-1/7">Sun (Growth)</th>
+                            <th class="p-3 bg-purple-200 rounded-lg w-1/7">Mon</th>
+                            <th class="p-3 bg-yellow-200 rounded-lg w-1/7">Tue</th>
+                            <th class="p-3 bg-yellow-200 rounded-lg w-1/7">Wed</th>
+                            <th class="p-3 bg-red-200 rounded-lg w-1/7">Thu</th>
+                            <th class="p-3 bg-green-200 rounded-lg w-1/7">Fri</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 6 AM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">06:00 AM</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">Fajr + Breakfast</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">Fajr + Breakfast</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">Fajr + Breakfast</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">Fajr + Review</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">Fajr + Review</td>
+                            <td class="p-3 bg-purple-50 rounded-lg text-purple-700 border-l-2 border-purple-200">AI Study</td>
+                            <td class="p-3 bg-green-100 rounded-lg text-green-800 font-semibold text-center">Sleep In</td>
+                        </tr>
+                        <!-- 8 AM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">08:00 AM</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 font-medium rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 font-medium rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 font-medium rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-orange-100 text-orange-900 rounded-lg">Commute</td>
+                            <td class="p-3 bg-yellow-100 text-yellow-900 font-semibold rounded-lg">Microprocessor</td>
+                            <td class="p-3 bg-yellow-100 text-yellow-900 font-semibold rounded-lg">Microprocessor</td>
+                            <td class="p-3 bg-green-50 rounded-lg text-center">Rest</td>
+                        </tr>
+                        <!-- 10 AM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">10:00 AM</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-indigo-100 text-indigo-900 rounded-lg border-l-2 border-indigo-300">Deep Work</td>
+                            <td class="p-3 bg-yellow-100 rounded-lg">Java Lab</td>
+                            <td class="p-3 bg-yellow-100 rounded-lg">Math</td>
+                            <td class="p-3 bg-red-100 text-red-900 font-bold text-center rounded-lg border-2 border-red-400 shadow-sm">
+                                DO NOT GO HOME<br><span class="text-xs font-normal">Library Study</span>
+                            </td>
+                            <td class="p-3 bg-green-50 rounded-lg text-center">Friends</td>
+                        </tr>
+                        <!-- 12 PM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">12:00 PM</td>
+                            <td class="p-3 bg-slate-100 rounded-lg text-slate-700 text-center">Dhuhr + Lunch</td>
+                            <td class="p-3 bg-slate-100 rounded-lg text-slate-700 text-center">Dhuhr + Lunch</td>
+                            <td class="p-3 bg-slate-100 rounded-lg text-slate-700 text-center">Dhuhr + Lunch</td>
+                            <td class="p-3 bg-yellow-100 rounded-lg">Microprocessor</td>
+                            <td class="p-3 bg-slate-100 text-slate-700 rounded-lg text-center">Dhuhr (Campus)</td>
+                            <td class="p-3 bg-slate-100 text-slate-700 rounded-lg text-center">Dhuhr (Campus)</td>
+                            <td class="p-3 bg-green-200 text-green-900 rounded-lg font-bold text-center border-l-2 border-green-400">Jummah Prayer</td>
+                        </tr>
+                        <!-- 2 PM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">02:00 PM</td>
+                            <td class="p-3 bg-blue-100 text-blue-900 rounded-lg font-medium">Assignments</td>
+                            <td class="p-3 bg-blue-100 text-blue-900 rounded-lg font-medium">Assignments</td>
+                            <td class="p-3 bg-blue-100 text-blue-900 rounded-lg font-medium">Assignments</td>
+                            <td class="p-3 text-slate-500 rounded-lg text-center">Free / Commute</td>
+                            <td class="p-3 bg-yellow-100 rounded-lg">Java Lab</td>
+                            <td class="p-3 bg-yellow-100 rounded-lg">Math + Java</td>
+                            <td class="p-3 text-slate-500 rounded-lg text-center">Cricket / Friends</td>
+                        </tr>
+                        <!-- 5 PM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">05:00 PM</td>
+                            <td class="p-3 text-emerald-700 rounded-lg font-medium text-center">Gym / Walk</td>
+                            <td class="p-3 text-emerald-700 rounded-lg font-medium text-center">Gym / Walk</td>
+                            <td class="p-3 text-emerald-700 rounded-lg font-medium text-center">Gym / Walk</td>
+                            <td class="p-3 bg-orange-100 rounded-lg">Commute</td>
+                            <td class="p-3 bg-orange-100 rounded-lg">Commute</td>
+                            <td class="p-3 bg-orange-100 rounded-lg">Commute</td>
+                            <td class="p-3 text-slate-700 rounded-lg text-center">Relax</td>
+                        </tr>
+                        <!-- 7 PM -->
+                        <tr>
+                            <td class="p-3 bg-slate-50 rounded-lg font-mono text-slate-400">07:00 PM</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Games / Relax</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Games / Relax</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Games / Relax</td>
+                            <td class="p-3 bg-blue-50 text-blue-700 font-medium rounded-lg text-center">Light Review</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Games</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Relax</td>
+                            <td class="p-3 bg-slate-800 text-white rounded-lg text-center">Games</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- HABIT TRACKER -->
+        <div id="view-habit" class="hidden">
+            <div class="bg-white p-6 shadow-sm rounded-xl border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Habits & Prayer Tracker
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                        <h3 class="font-bold text-blue-800 text-lg mb-4 flex items-center gap-2"><span>🤲</span> Prayer</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-blue-600 rounded"> <span class="text-slate-700">Fajr</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-blue-600 rounded"> <span class="text-slate-700">Dhuhr</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-blue-600 rounded"> <span class="text-slate-700">Asr</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-blue-600 rounded"> <span class="text-slate-700">Maghrib</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-blue-600 rounded"> <span class="text-slate-700">Isha</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                        <h3 class="font-bold text-emerald-800 text-lg mb-4 flex items-center gap-2"><span>🚀</span> Daily Habits</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-emerald-600 rounded"> <span class="text-slate-700">1 Hour Deep Work</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-emerald-600 rounded"> <span class="text-slate-700">1 Hour AI Project</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-emerald-600 rounded"> <span class="text-slate-700">No Social Media</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-emerald-600 rounded"> <span class="text-slate-700">2–3L Water</span></li>
+                            <li class="flex items-center gap-3"><input type="checkbox" class="w-5 h-5 text-emerald-600 rounded"> <span class="text-slate-700">Gym / Walking</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI COACH TAB -->
+        <div id="view-ai" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Feature 1: Study Breakdown -->
+                <div class="lg:col-span-2 bg-white p-6 shadow-sm rounded-xl border border-slate-200">
+                    <h2 class="text-xl font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                        <span>📚</span> Smart Study Planner
+                    </h2>
+                    <p class="text-slate-600 text-sm mb-4">Enter a complex topic (e.g., "Microprocessors", "React Hooks"). AI will break it into a step-by-step checklist for your Deep Work blocks.</p>
+
+                    <div class="flex gap-2 mb-4">
+                        <input id="studyInput" type="text" placeholder="e.g., Learn 8086 Assembly Language..." class="flex-1 border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <button onclick="generateStudyPlan()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                            Plan ✨
+                        </button>
+                    </div>
+
+                    <div id="studyOutput" class="bg-slate-50 rounded-lg p-4 border border-slate-100 min-h-[150px] text-slate-700 text-sm hidden prose">
+                        <!-- AI Content goes here -->
+                    </div>
+                </div>
+
+                <!-- Feature 2: Discipline Reset -->
+                <div class="bg-white p-6 shadow-sm rounded-xl border border-slate-200">
+                    <h2 class="text-xl font-bold text-emerald-700 mb-2 flex items-center gap-2">
+                        <span>🔋</span> Discipline Reset
+                    </h2>
+                    <p class="text-slate-600 text-sm mb-4">Feeling lazy, reactive, or overwhelmed? Let the AI coach you back to focus.</p>
+
+                    <div class="space-y-3">
+                        <button onclick="getCoachAdvice('procrastinating')" class="w-full text-left px-4 py-3 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors flex items-center gap-3">
+                            <span class="text-xl">🐢</span>
+                            <div>
+                                <div class="font-semibold text-orange-900">I'm Procrastinating</div>
+                                <div class="text-xs text-orange-700">Need tough love</div>
+                            </div>
+                        </button>
+
+                        <button onclick="getCoachAdvice('overwhelmed')" class="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors flex items-center gap-3">
+                            <span class="text-xl">🤯</span>
+                            <div>
+                                <div class="font-semibold text-blue-900">I'm Overwhelmed</div>
+                                <div class="text-xs text-blue-700">Need calm structure</div>
+                            </div>
+                        </button>
+
+                        <button onclick="getCoachAdvice('lazy')" class="w-full text-left px-4 py-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors flex items-center gap-3">
+                            <span class="text-xl">🛋️</span>
+                            <div>
+                                <div class="font-semibold text-red-900">I skipped Prayer/Habits</div>
+                                <div class="text-xs text-red-700">Get back on track</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div id="coachOutput" class="mt-4 bg-emerald-50 rounded-lg p-4 border border-emerald-100 hidden text-sm text-slate-700 italic">
+                        <!-- Advice goes here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+<script>
+// === CONFIG: your Render backend URL ===
+const BACKEND_URL = "https://abirs-smart-routine.onrender.com";
+
+// --- Tab Logic ---
+function switchTab(tab) {
+    ['schedule', 'habit', 'ai'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove(
+            'border-blue-600','text-blue-600','border-indigo-600','text-indigo-600'
+        );
+        document.getElementById(`tab-${t}`).classList.add('border-transparent','text-slate-500');
+    });
+
+    document.getElementById(`view-${tab}`).classList.remove('hidden');
+
+    const activeBtn = document.getElementById(`tab-${tab}`);
+    activeBtn.classList.remove('border-transparent','text-slate-500');
+    if (tab === 'ai') {
+        activeBtn.classList.add('border-indigo-600','text-indigo-600');
+    } else {
+        activeBtn.classList.add('border-blue-600','text-blue-600');
+    }
+}
+
+// --- CSV Download Logic ---
+function downloadCSV() {
+    const rows = [
+        ["Time","Sat","Sun","Mon","Tue","Wed","Thu","Fri"],
+        ["6:00 AM","Fajr + Breakfast","Fajr","Fajr","Fajr + Review","Fajr + Review","AI Study","Sleep In"],
+        ["8:00 AM","Deep Work","Deep Work","Deep Work","Commute","Microprocessor","Microprocessor","Rest"],
+        ["10:00 AM","Deep Work","Deep Work","Deep Work","Java Lab","Math","Library Study","Friends"],
+        ["12:00 PM","Dhuhr + Lunch","Dhuhr + Lunch","Dhuhr + Lunch","Microprocessor","Dhuhr","Dhuhr","Jummah"],
+        ["2:00 PM","Assignments","Assignments","Assignments","Free/Commute","Java Lab","Math + Java","Cricket"],
+        ["5:00 PM","Gym","Gym","Gym","Commute","Commute","Commute","Relax"],
+        ["7:00 PM","Games","Games","Games","Light Review","Games","Relax","Games"],
+    ];
+    let csv = "data:text/csv;charset=utf-8,";
+    rows.forEach(r => csv += r.map(c => `"${c}"`).join(",") + "
+");
+    const link = document.createElement("a");
+    link.href = encodeURI(csv);
+    link.download = "Abir_Weekly_Grid.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// --- Helper: call backend ---
+async function callBackend(path, body) {
+    const res = await fetch(`${BACKEND_URL}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body || {})
+    });
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Server error ${res.status}: ${text || res.statusText}`);
+    }
+    return res.json();
+}
+
+// --- AI Feature 1: Study Planner (/api/study-plan) ---
+async function generateStudyPlan() {
+    const input = document.getElementById("studyInput");
+    const topic = input.value.trim();
+    const outputDiv = document.getElementById("studyOutput");
+
+    if (!topic) {
+        outputDiv.classList.remove("hidden");
+        outputDiv.innerHTML = '<span class="text-slate-500">Type a topic first.</span>';
+        return;
+    }
+
+    outputDiv.classList.remove("hidden");
+    outputDiv.innerHTML = '<span class="loading-dots text-slate-500">Thinking</span>';
+
+    try {
+        const data = await callBackend("/api/study-plan", { topic });
+
+        const text = data.plan || "No plan generated.";
+        if (window.marked) {
+            outputDiv.innerHTML = marked.parse(text);
+        } else {
+            outputDiv.textContent = text;
+        }
+    } catch (err) {
+        console.error(err);
+        outputDiv.innerHTML = `<span class="text-red-500">Error: ${err.message}</span>`;
+    }
+}
+
+// --- AI Feature 2: Discipline Coach (/api/discipline-reset) ---
+async function getCoachAdvice(mood) {
+    const outputDiv = document.getElementById("coachOutput");
+    outputDiv.classList.remove("hidden");
+    outputDiv.innerHTML = '<span class="loading-dots text-slate-500">Thinking</span>';
+
+    let mode;
+    if (mood === "procrastinating") mode = "procrastinating";
+    else if (mood === "overwhelmed") mode = "overwhelmed";
+    else mode = "skipped_prayer"; // for the "lazy" button
+
+    try {
+        const data = await callBackend("/api/discipline-reset", { mode });
+
+        const text = data.message || "No advice received.";
+        if (window.marked) {
+            outputDiv.innerHTML = marked.parse(text);
+        } else {
+            outputDiv.textContent = text;
+        }
+    } catch (err) {
+        console.error(err);
+        outputDiv.innerHTML = `<span class="text-red-500">Error: ${err.message}</span>`;
+    }
+}
+</script>
+
+</body>
+</html>
